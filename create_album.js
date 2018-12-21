@@ -21,17 +21,25 @@ const db = pgp(config);
 var co = require("co");
 var prompt = require("prompt-promise");
 
-var biz = { name: "" };
-const q = "INSERT INTO artists VALUES (default, ${name})";
-const r = "SELECT id FROM artists WHERE name = ${name}";
+var biz = { name: "", year: 0, artist_id: 0 };
+const q = "INSERT INTO albums VALUES (default, ${name}, ${year}, ${artist_id})";
+const r = "SELECT id FROM albums WHERE name = ${name}";
 
-prompt("Artist name? ")
-  .then(value => {
-    biz.name = value;
+prompt("Album name?")
+  .then(val => {
+    biz.name = val;
+    return prompt("year: ");
+  })
+  .then(val => {
+    biz.year = val;
+    return prompt("Artist id?");
+  })
+  .then(val => {
+    biz.artist_id = val;
     db.result(q, biz).then(res => {
       db.any(r, biz)
-        .then(function(results) {
-          console.log(`Created artist with ID ${results[0].id}`);
+        .then(function(res) {
+          console.log(`Created album with ID ${res[0].id}`);
         })
         .then(res => {
           pgp.end();
